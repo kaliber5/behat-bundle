@@ -1,0 +1,18 @@
+{
+    "name": "kaliber5/behat-bundle",
+    "description": "Support for Behat tests",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "simon",
+            "email": "ihmig@kaliber5.de"
+        }
+    ],
+    "require": {
+        "behat/behat" : "^3.1",
+        "behat/symfony2-extension" : "^2.1",
+        "behat/mink" : "^1.7",
+        "behat/mink-extension" : "^2.2",
+        "behat/mink-browserkit-driver" : "^1.3"
+    }
+}
