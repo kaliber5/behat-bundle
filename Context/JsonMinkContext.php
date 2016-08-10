@@ -4,6 +4,7 @@ namespace Kaliber5\BehatBundle\Context;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Driver\KernelDriver;
+use Coduo\PHPMatcher\PHPUnit\PHPMatcherAssertions;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
@@ -16,6 +17,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class JsonMinkContext extends MinkContext
 {
+    use PHPMatcherAssertions;
 
     protected $_defaultMimeTypes = array(
         'json' => 'application/json',
@@ -227,6 +229,45 @@ class JsonMinkContext extends MinkContext
         }
     }
 
+    /**
+     * @Then I will see the :arg1 resources as json
+     */
+    public function iWillSeeTheListOfAsJson($arg1)
+    {
+        $expected = $this->getReplacedFileContent($this->getJsonResponseFilePath($arg1.'_get.json'));
+        $response = $this->getJsonResponseContent();
+
+        assertThat($response, self::matchesPattern($expected), 'The value is not as expected');
+    }
+
+    /**
+     * @Then I will see the :arg1 resource with id :arg2 as json
+     */
+    public function iWillSeeTheResourceWithIdAsJson($arg1, $arg2)
+    {
+        $expected = $this->getReplacedFileContent($this->getJsonResponseFilePath($arg1.'_get_'.$arg2.'.json'));
+        $response = $this->getJsonResponseContent();
+
+        assertThat($response, self::matchesPattern($expected), 'The value is not as expected');
+    }
+
+    /**
+     * returns the file content, replace the array-keys with the array values
+     *
+     * @param string $filename the filename
+     * @param array  $replace  an array like [ 'searchval' => 'replaceval']
+     *
+     * @return mixed|string
+     */
+    protected function getReplacedFileContent($filename, array $replace = [])
+    {
+        $content = file_get_contents($filename);
+        if (!empty($replace)) {
+            $content = str_replace(array_keys($replace), array_values($replace), $content);
+        }
+
+        return $content;
+    }
 
     /**
      * returns a well formatted json string from json file
@@ -236,12 +277,9 @@ class JsonMinkContext extends MinkContext
      *
      * @return string
      */
-    protected function getJsonFileContent($filename, array $replace = array())
+    protected function getJsonFileContent($filename, array $replace = [])
     {
-        $content = file_get_contents($filename);
-        if (!empty($replace)) {
-            $content = str_replace(array_keys($replace), array_values($replace), $content);
-        }
+        $content = $this->getReplacedFileContent($filename, $replace);
 
         return $this->formatJsonString($content);
     }
