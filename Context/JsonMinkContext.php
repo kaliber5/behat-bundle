@@ -222,11 +222,9 @@ class JsonMinkContext extends MinkContext
     public function compareJsonResponseToFileContent($filename, array $replace = [])
     {
         /** @noinspection PhpParamsInspection */
-        $expected = $this->getJsonFileContent($this->getJsonResponseFilePath($filename), $replace);
+        $expected = $this->getReplacedFileContent($this->getJsonResponseFilePath($filename), $replace);
         $response = $this->getJsonResponseContent();
-        if ($expected !== $response) {
-            throw new \Exception("Responded Json is not the expected Json. Expected:  \n\n".$expected."\n\nResponse: \n\n".$response);
-        }
+        assertThat($response, self::matchesPattern($expected), 'The value is not as expected');
     }
 
     /**
