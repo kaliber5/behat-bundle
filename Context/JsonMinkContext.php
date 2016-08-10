@@ -232,10 +232,7 @@ class JsonMinkContext extends MinkContext
      */
     public function iWillSeeTheListOfAsJson($arg1)
     {
-        $expected = $this->getReplacedFileContent($this->getJsonResponseFilePath($arg1.'_get.json'));
-        $response = $this->getJsonResponseContent();
-
-        assertThat($response, self::matchesPattern($expected), 'The value is not as expected');
+        $this->compareJsonResponseToFileContent($arg1.'_get.json');
     }
 
     /**
@@ -243,10 +240,7 @@ class JsonMinkContext extends MinkContext
      */
     public function iWillSeeTheResourceWithIdAsJson($arg1, $arg2)
     {
-        $expected = $this->getReplacedFileContent($this->getJsonResponseFilePath($arg1.'_get_'.$arg2.'.json'));
-        $response = $this->getJsonResponseContent();
-
-        assertThat($response, self::matchesPattern($expected), 'The value is not as expected');
+        $this->compareJsonResponseToFileContent($arg1.'_get_'.$arg2.'.json');
     }
 
     /**
