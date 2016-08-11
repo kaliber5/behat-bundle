@@ -20,11 +20,11 @@ class JsonMinkContext extends MinkContext
 {
     use PHPMatcherAssertions;
 
-    protected $relativeRequestPath;
-    protected $relativeResponsePath;
+    protected $relativeRequestPath = 'Features/JsonRequest/';
+    protected $relativeResponsePath = 'Features/JsonResponse/';
     protected $bundle;
 
-    protected $apiPath;
+    protected $apiPath = 'api/';
     protected $requestPath;
     protected $responsePath;
 
