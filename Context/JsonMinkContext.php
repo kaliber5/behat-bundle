@@ -19,10 +19,110 @@ class JsonMinkContext extends MinkContext
 {
     use PHPMatcherAssertions;
 
+    protected $relativeRequestPath;
+    protected $relativeResponsePath;
+    protected $bundle;
+
+    protected $apiPath;
+    protected $requestPath;
+    protected $responsePath;
+
+    protected $lastResource;
+    protected $lastResourceId;
+
     protected $_defaultMimeTypes = array(
         'json' => 'application/json',
         'jsonapi' => 'application/vnd.api+json'
     );
+
+    /**
+     * JsonMinkContext constructor.
+     *
+     * @param string   $bundle
+     * @param string $requestPath
+     * @param string $responsePath
+     * @param string $apiPath
+     */
+    public function __construct(
+        $bundle = null,
+        $requestPath = 'Features/JsonRequest/',
+        $responsePath = 'Features/JsonResponse/',
+        $apiPath = 'api/'
+    ) {
+        $this->bundle = $bundle;
+        $this->relativeRequestPath = $requestPath;
+        $this->relativeResponsePath = $responsePath;
+        $this->apiPath = $apiPath;
+    }
+
+    /**
+     * @When I go to the :arg1 resources
+     */
+    public function iGoToTheResources($arg1)
+    {
+        $this->visit($this->apiPath.$arg1);
+        $this->lastResource = $arg1;
+    }
+
+    /**
+     * @Then I will see the resources as json
+     */
+    public function iSeeTheResourcesAsJson()
+    {
+        $this->compareJsonResponseToFileContent($this->lastResource.'_get.json');
+    }
+
+    /**
+     * @When I go to the :arg1 resource with id :arg2
+     */
+    public function iGoToTheResourceWithId($arg1, $arg2)
+    {
+        $this->visit($this->apiPath.$arg1.'/'.$arg2);
+        $this->lastResource = $arg1;
+        $this->lastResourceId = $arg2;
+    }
+
+    /**
+     * @Then I will see the resource as json
+     */
+    public function iSeeTheResourceAsJson()
+    {
+        $this->compareJsonResponseToFileContent($this->lastResource.'_get_'.$this->lastResourceId.'.json');
+    }
+
+    /**
+     * @When I filter the :arg1 resources with:
+     */
+    public function iFilterTheResourcesWith($arg1, TableNode $table)
+    {
+        $filter = [];
+
+        foreach ($table as $row) {
+            $filter[] = 'filter['.$row['property'].']='.$row['value'];
+        }
+
+        $this->visit($this->apiPath.$arg1.'?'.implode('&', $filter));
+        $this->lastResource = $arg1;
+    }
+
+    /**
+     * @Then I will see the resources filtered by :arg1
+     */
+    public function iWillSeeTheResourcesFilteredBy($arg1)
+    {
+        $this->compareJsonResponseToFileContent($this->lastResource.'_get_filtered_'.$arg1.'.json');
+    }
+
+    /**
+     * @Then I will see the resources filtered by :arg1 with value :arg2
+     */
+    public function iWillSeeTheResourcesFilteredByWithValue($arg1, $arg2)
+    {
+        $this->compareJsonResponseToFileContent(
+            $this->lastResource.'_get_filtered_'.$arg1.'.json',
+            ['#'.$arg1.'#' => $arg2]
+        );
+    }
 
     /**
      * @Then I should see a valid :responseType response
@@ -298,29 +398,35 @@ class JsonMinkContext extends MinkContext
     }
 
     /**
-     * returns the filepath with json response, default to currentdir/../JsonResponse/$file
+     * returns the filepath with json response
+     *
      * @param string $file the filename
+     *
      * @return string
      */
     protected function getJsonResponseFilePath($file)
     {
-        $reflection = new \ReflectionClass($this);
-        $directory = dirname($reflection->getFileName()).PATH_SEPARATOR;
+        if (!$this->responsePath) {
+            $this->generatePaths();
+        }
 
-        return $directory.'/../JsonResponse/'.$file;
+        return $this->responsePath.$file;
     }
 
     /**
-     * returns the filepath with json response, default to currentdir/../JsonResponse/$file
+     * returns the filepath with json request
+     *
      * @param string $file the filename
+     *
      * @return string
      */
     protected function getJsonRequestFilePath($file)
     {
-        $reflection = new \ReflectionClass($this);
-        $directory = dirname($reflection->getFileName()).PATH_SEPARATOR;
+        if (!$this->requestPath) {
+            $this->generatePaths();
+        }
 
-        return $directory.'/../JsonRequest/'.$file;
+        return $this->requestPath.$file;
     }
 
     /**
@@ -374,5 +480,23 @@ class JsonMinkContext extends MinkContext
         /** @noinspection PhpUndefinedMethodInspection */
 
         return $this->getSession()->getDriver()->getClient()->getContainer();
+    }
+
+    /**
+     * generates the paths to files
+     */
+    protected function generatePaths()
+    {
+        $basePath = '';
+        if ($this->bundle === null) {
+            $reflection = new \ReflectionClass($this);
+            $basePath = dirname(
+                    $reflection->getFileName()
+                ).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
+        } else {
+            $basePath = $this->getContainer()->get('kernel')->locateResource('@'.$this->bundle);
+        }
+        $this->responsePath = $basePath.$this->relativeResponsePath;
+        $this->requestPath = $basePath.$this->relativeRequestPath;
     }
 }
