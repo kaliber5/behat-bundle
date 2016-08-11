@@ -1,6 +1,7 @@
 <?php
 namespace Kaliber5\BehatBundle\Context;
 
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Driver\KernelDriver;
