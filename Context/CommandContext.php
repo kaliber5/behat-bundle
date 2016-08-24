@@ -135,8 +135,9 @@ class CommandContext implements KernelAwareContext, SnippetAcceptingContext
 
     /**
      * @Given /^I run a command "([^"]*)"$/
-     * @Given /^(T|t)he command "([^"]*)" was executed$/
-     * @When /^(T|t)he command "([^"]*)" executes$/
+     * @Given /^The command "([^"]*)" was executed$/
+     * @Given /^the command "([^"]*)" was executed$/
+     * @When /^the command "([^"]*)" executes$/
      */
     public function iRunACommand($command)
     {
