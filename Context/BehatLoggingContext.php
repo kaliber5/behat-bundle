@@ -54,7 +54,4 @@ class BehatLoggingContext implements KernelAwareContext
             }
         }
     }
-
-
-
 }
