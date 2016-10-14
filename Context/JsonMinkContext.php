@@ -126,6 +126,24 @@ class JsonMinkContext extends MinkContext
     }
 
     /**
+     * @Then I will see the resources filtered by values:
+     */
+    public function iWillSeeTheResourcesFilteredByValues(TableNode $table)
+    {
+        $replace = [];
+        $props = [];
+
+        foreach ($table as $row) {
+            $replace['#'.$row['property'].'#'] = $row['value'];
+            $props[] = $row['property'];
+        }
+        $this->compareJsonResponseToFileContent(
+            $this->lastResource.'_get_filtered_'.implode('_', $props).'.json',
+            $replace
+        );
+    }
+
+    /**
      * @Then I should see a valid :responseType response
      */
     public function iShouldSeeAValidJsonResponse($responseType = 'json')
@@ -463,6 +481,9 @@ class JsonMinkContext extends MinkContext
             );
         }
 
+        if (!$driver->getClient()->getResponse()) {
+            throw new \RuntimeException('There is no Response object');
+        }
         $profile = $driver->getClient()->getProfile();
         if (false === $profile) {
             throw new \RuntimeException(

@@ -78,17 +78,24 @@ trait EmailAssertionsTrait
     }
 
     /**
-     * @return array with messages
+     * @return \Swift_Mime_Message[] array with messages
      *
      * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
      */
     public function getMessages()
     {
-        $profile = $this->getSymfonyProfile();
-        /** @var MessageDataCollector $collector */
-        $collector = $profile->getCollector('swiftmailer');
+        try {
+            $profile = $this->getSymfonyProfile();
+            /** @var MessageDataCollector $collector */
+            $collector = $profile->getCollector('swiftmailer');
 
-        return $collector->getMessages();
+            return $collector->getMessages();
+        } catch (\Exception $e) {
+            /** @var \Swift_Plugins_MessageLogger $logger */
+            $logger = $this->getContainer()->get('swiftmailer.plugin.messagelogger');
+
+            return $logger->getMessages();
+        }
     }
 
     /**
@@ -98,10 +105,17 @@ trait EmailAssertionsTrait
      */
     public function getMessageCount()
     {
-        $profile = $this->getSymfonyProfile();
-        /** @var MessageDataCollector $collector */
-        $collector = $profile->getCollector('swiftmailer');
+        try {
+            $profile = $this->getSymfonyProfile();
+            /** @var MessageDataCollector $collector */
+            $collector = $profile->getCollector('swiftmailer');
 
-        return $collector->getMessageCount();
+            return $collector->getMessageCount();
+        } catch (\Exception $e) {
+            /** @var \Swift_Plugins_MessageLogger $logger */
+            $logger = $this->getContainer()->get('swiftmailer.plugin.messagelogger');
+
+            return $logger->countMessages();
+        }
     }
 }
