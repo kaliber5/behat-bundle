@@ -92,6 +92,15 @@ class JsonMinkContext extends MinkContext
     }
 
     /**
+     * @When I sort the :arg1 by :arg2
+     */
+    public function iSortTheResourceBy($arg1, $arg2)
+    {
+        $this->visit($this->apiPath.$arg1.'?sort='.$arg2);
+        $this->lastResource = $arg1;
+    }
+
+    /**
      * @When I filter the :arg1 resources with:
      */
     public function iFilterTheResourcesWith($arg1, TableNode $table)
