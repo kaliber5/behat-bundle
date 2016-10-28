@@ -21,6 +21,12 @@ namespace Kaliber5\BehatBundle\ContextTraits;
 trait EmailAssertionsTrait
 {
 
+    /** @BeforeScenario */
+    public function clearLogger()
+    {
+        $this->getContainer()->get('swiftmailer.plugin.messagelogger')->clear();
+    }
+
     /**
      * asserts no email was sent
      */
@@ -80,42 +86,25 @@ trait EmailAssertionsTrait
     /**
      * @return \Swift_Mime_Message[] array with messages
      *
-     * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
      */
     public function getMessages()
     {
-        try {
-            $profile = $this->getSymfonyProfile();
-            /** @var MessageDataCollector $collector */
-            $collector = $profile->getCollector('swiftmailer');
-
-            return $collector->getMessages();
-        } catch (\Exception $e) {
-            /** @var \Swift_Plugins_MessageLogger $logger */
-            $logger = $this->getContainer()->get('swiftmailer.plugin.messagelogger');
-
-            return $logger->getMessages();
+        /** @var \Swift_Plugins_MessageLogger $logger */
+        $logger = $this->getContainer()->get('swiftmailer.plugin.messagelogger');
+        $messages = [];
+        foreach ($logger->getMessages() as $message) {
+            $messages[$message->getId()] = $message;
         }
+
+        return $messages;
     }
 
     /**
      * @return int
      *
-     * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
      */
     public function getMessageCount()
     {
-        try {
-            $profile = $this->getSymfonyProfile();
-            /** @var MessageDataCollector $collector */
-            $collector = $profile->getCollector('swiftmailer');
-
-            return $collector->getMessageCount();
-        } catch (\Exception $e) {
-            /** @var \Swift_Plugins_MessageLogger $logger */
-            $logger = $this->getContainer()->get('swiftmailer.plugin.messagelogger');
-
-            return $logger->countMessages();
-        }
+        return count($this->getMessages());
     }
 }
