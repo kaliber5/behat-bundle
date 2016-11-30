@@ -49,6 +49,7 @@ trait DBCacheTrait
         if (file_exists($source)) {
             $target = $this->getDbPath().$this->getDbName();
             copy($source, $target);
+            $this->getContainer()->get('doctrine.orm.entity_manager')->clear();
 
             return true;
         }
