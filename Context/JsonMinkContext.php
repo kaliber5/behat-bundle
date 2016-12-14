@@ -280,6 +280,7 @@ class JsonMinkContext extends MinkContext
             [
                 'CONTENT_TYPE' => $contentType,
                 'HTTP_ACCEPT'  => $contentType,
+                'HTTP_X-Requested-With' => (strpos($requestType, 'json') !== false)?'XMLHttpRequest':'',
             ],
             $requestBodyFilename
         );
@@ -312,6 +313,7 @@ class JsonMinkContext extends MinkContext
             [
                 'CONTENT_TYPE' => $contentType,
                 'HTTP_ACCEPT'  => $contentType,
+                'HTTP_X-Requested-With' => (strpos($responseType, 'json') !== false) ? 'XMLHttpRequest' : '',
             ],
             $this->getJsonFileContent($this->getJsonRequestFilePath($requestBodyFilename), $replace)
         );
