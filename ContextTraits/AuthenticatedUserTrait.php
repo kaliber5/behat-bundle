@@ -11,6 +11,7 @@ namespace Kaliber5\BehatBundle\ContextTraits;
 use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
@@ -83,19 +84,47 @@ trait AuthenticatedUserTrait
         }
 
         $client = $driver->getClient();
+        /** @var Session $session */
+        $session = $client->getContainer()->get('session');
+        $session->get('_security_'.$context);
+        $session->clear();
+
         $client->getCookieJar()->clear();
 
-        $session = $client->getContainer()->get('session');
-        $providerKey = $context; // the context of the firewall
         if (!is_array($roles)) {
             $roles = array($roles);
         }
 
-        $token = new UsernamePasswordToken($user, null, $providerKey, $roles);
-        $session->set('_security_'.$providerKey, serialize($token));
+        $token = new UsernamePasswordToken($user, null, $context, $roles);
+        $session->set('_security_'.$context, serialize($token));
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
         $client->getCookieJar()->set($cookie);
+    }
+
+    /**
+     * @AfterScenario
+     *
+     */
+    public function cleanDb()
+    {
+        $driver = $this->getSession()->getDriver();
+        if (!$driver instanceof BrowserKitDriver) {
+            throw new UnsupportedDriverActionException(
+                'This step is only supported by the BrowserKitDriver',
+                $driver
+            );
+        }
+
+        $client = $driver->getClient();
+        /** @var Session $session */
+        $session = $client->getContainer()->get('session');
+        if ($session->isStarted()) {
+            $session->clear();
+            $session->save();
+        }
+
+        $client->getCookieJar()->clear();
     }
 }
