@@ -73,6 +73,7 @@ trait AuthenticatedUserTrait
      */
     public function authenticatedAsWithRole($user, $roles, $context = 'user')
     {
+        $this->visit('/');//This is needed to get a session started
         $driver = $this->getSession()->getDriver();
         if (!$driver instanceof BrowserKitDriver) {
             throw new UnsupportedDriverActionException(
@@ -84,7 +85,6 @@ trait AuthenticatedUserTrait
         $client = $driver->getClient();
         $client->getCookieJar()->clear();
 
-        $this->visit('/');//This is needed to get a seesion started
         $session = $client->getContainer()->get('session');
         $providerKey = $context; // the context of the firewall
         if (!is_array($roles)) {
