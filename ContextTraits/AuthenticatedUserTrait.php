@@ -107,7 +107,7 @@ trait AuthenticatedUserTrait
      * @AfterScenario
      *
      */
-    public function cleanDb()
+    public function cleanSession()
     {
         $driver = $this->getSession()->getDriver();
         if (!$driver instanceof BrowserKitDriver) {
