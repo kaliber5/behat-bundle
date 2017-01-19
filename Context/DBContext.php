@@ -23,8 +23,6 @@ class DBContext extends AliceORMContext
      */
     public function setKernel(KernelInterface $kernel)
     {
-        $this->setDatabaseName(md5(microtime()));
-
         /** @var ConnectionFactory $factory */
         $factory = $kernel->getContainer()->get('doctrine.dbal.connection_factory');
         if ($factory instanceof ConnectionFactory) {
@@ -41,6 +39,10 @@ class DBContext extends AliceORMContext
      */
     public function getDatabaseName()
     {
+        if ($this->dbname === '') {
+            $this->dbname = substr(md5(microtime()), 0, 40);
+        }
+
         return $this->dbname;
     }
 

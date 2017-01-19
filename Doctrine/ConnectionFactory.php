@@ -31,8 +31,8 @@ class ConnectionFactory extends BaseConnectionFactory
         EventManager $eventManager = null,
         array $mappingTypes = []
     ) {
-        $params['dbname'] = $params['dbname'].$this->getDbName();
-        $params['path'] = $params['dbname'].$this->getDbName();
+        $params['dbname'] = substr($params['dbname'], 0, strrpos($params['dbname'], '/') + 1).$this->getDbName();
+        $params['path'] = $params['dbname'];
 
         return parent::createConnection(
             $params,
