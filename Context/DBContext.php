@@ -26,6 +26,7 @@ class DBContext extends AliceORMContext
         /** @var ConnectionFactory $factory */
         $factory = $kernel->getContainer()->get('doctrine.dbal.connection_factory');
         if ($factory instanceof ConnectionFactory) {
+            $this->setDatabaseName($factory->getDbName());
             $factory->setDbName($this->getDatabaseName());
         } else {
             throw new \Exception(get_class($factory));

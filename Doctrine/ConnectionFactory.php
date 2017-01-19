@@ -31,6 +31,10 @@ class ConnectionFactory extends BaseConnectionFactory
         EventManager $eventManager = null,
         array $mappingTypes = []
     ) {
+        if (self::$dbName === '') {
+            $this->createDbName();
+        }
+
         $params['dbname'] = substr($params['dbname'], 0, strrpos($params['dbname'], '/') + 1).$this->getDbName();
         $params['path'] = $params['dbname'];
 
@@ -56,5 +60,13 @@ class ConnectionFactory extends BaseConnectionFactory
     public function setDbName($dbName)
     {
         self::$dbName = $dbName;
+    }
+
+    /**
+     * creates an custom db name
+     */
+    protected function createDbName()
+    {
+        self::$dbName = substr(md5(microtime()), 0, 40);
     }
 }
