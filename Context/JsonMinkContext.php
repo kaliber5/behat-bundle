@@ -332,6 +332,22 @@ class JsonMinkContext extends MinkContext
     }
 
     /**
+     * Support Network Protocol
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function locatePath($path)
+    {
+        if (0 === strrpos($path, '//')) {
+            return $path;
+        }
+
+        return parent::locatePath($path);
+    }
+
+    /**
      * returns the content of the current request
      *
      * @return string
