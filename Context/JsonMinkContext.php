@@ -84,6 +84,36 @@ class JsonMinkContext extends MinkContext
     }
 
     /**
+     * @When I send a delete request to the :arg1 resource with id :arg2
+     */
+    public function iSendADeleteRequestToTheResourceWithId($arg1, $arg2)
+    {
+        $this->lastResource = $arg1;
+        $this->lastResourceId = $arg2;
+        $this->sendDeleteRequest($this->apiPath.$arg1.'/'.$arg2);
+    }
+
+    /**
+     * @When I send a patch request to the :arg1 resource with id :arg2
+     */
+    public function iSendAPatchRequestToTheResourceWithId($arg1, $arg2)
+    {
+        $this->lastResource = $arg1;
+        $this->lastResourceId = $arg2;
+        $this->sendPatchRequest($this->apiPath.$arg1.'/'.$arg2, $this->lastResource.'_patch_'.$this->lastResourceId.'.json', 'jsonapi');
+    }
+
+    /**
+     * @When I send a post request to the :arg1 resource with id :arg2
+     */
+    public function iSendAPostRequestToTheResourceWithId($arg1, $arg2)
+    {
+        $this->lastResource = $arg1;
+        $this->lastResourceId = $arg2;
+        $this->sendPostRequest($this->apiPath.$arg1.'/'.$arg2, $this->lastResource.'_post_'.$this->lastResourceId.'.json', 'jsonapi');
+    }
+
+    /**
      * @Then I will see the resource as json
      */
     public function iSeeTheResourceAsJson()
