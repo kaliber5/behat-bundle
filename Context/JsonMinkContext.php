@@ -104,13 +104,12 @@ class JsonMinkContext extends MinkContext
     }
 
     /**
-     * @When I send a post request to the :arg1 resource with id :arg2
+     * @When I send a post request to the :arg1 resource
      */
-    public function iSendAPostRequestToTheResourceWithId($arg1, $arg2)
+    public function iSendAPostRequestToTheResourceWithId($arg1)
     {
         $this->lastResource = $arg1;
-        $this->lastResourceId = $arg2;
-        $this->sendPostRequest($this->apiPath.$arg1.'/'.$arg2, $this->lastResource.'_post_'.$this->lastResourceId.'.json', 'jsonapi');
+        $this->sendPostRequest($this->apiPath.$arg1, $this->lastResource.'_post.json', 'jsonapi');
     }
 
     /**
