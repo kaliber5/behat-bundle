@@ -8,6 +8,8 @@
 
 namespace Kaliber5\BehatBundle\ContextTraits;
 
+use Coduo\PHPMatcher\PHPUnit\PHPMatcherAssertions;
+
 /**
  * Trait to assert that emails were sent
  *
@@ -20,6 +22,7 @@ namespace Kaliber5\BehatBundle\ContextTraits;
  */
 trait EmailAssertionsTrait
 {
+    use PHPMatcherAssertions;
 
     /** @BeforeScenario */
     public function clearLogger()
@@ -84,6 +87,32 @@ trait EmailAssertionsTrait
     }
 
     /**
+     * Assert the email body of emails to the given recipient match the given fixture file
+     *
+     * @param $recipient
+     * @param $contentFilename
+     */
+    public function assertEmailHasContent($recipient, $contentFilename)
+    {
+        $expected = $this->getEmailFileContent($contentFilename);
+        $subject = null;
+        if (preg_match('/^Subject: (.*)\n/', $expected, $matches)) {
+            $expected = str_replace($matches[0], '', $expected);
+            $subject = $matches[1];
+        }
+        $this->assertEmailWasSent($recipient, function($messages) use ($expected, $subject) {
+            foreach ($messages as $message) {
+                /** @var \Swift_Message $message */
+                $actual = rtrim($message->getBody());
+                assertThat($actual, self::matchesPattern($expected), 'The email content is not as expected');
+                if ($subject !== null) {
+                    assertThat($message->getSubject(), self::matchesPattern($subject), 'The email content is not as expected');
+                }
+            }
+        });
+    }
+
+    /**
      * @return \Swift_Mime_Message[] array with messages
      *
      */
@@ -106,5 +135,18 @@ trait EmailAssertionsTrait
     public function getMessageCount()
     {
         return count($this->getMessages());
+    }
+
+    /**
+     * @param $filename
+     *
+     * @return bool|string
+     */
+    protected function getEmailFileContent($filename) {
+        if (!$this->basePath) {
+            $this->generatePaths();
+        }
+        $fullPath = $this->basePath . 'Features' . DIRECTORY_SEPARATOR . 'EmailContent' . DIRECTORY_SEPARATOR . $filename;
+        return file_get_contents($fullPath);
     }
 }
