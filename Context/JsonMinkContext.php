@@ -27,6 +27,7 @@ class JsonMinkContext extends MinkContext
     protected $apiPath = 'api/';
     protected $requestPath;
     protected $responsePath;
+    protected $basePath;
 
     protected $lastResource;
     protected $lastResourceId;
@@ -574,6 +575,7 @@ class JsonMinkContext extends MinkContext
         } else {
             $basePath = $this->getContainer()->get('kernel')->locateResource('@'.$this->bundle);
         }
+        $this->basePath = $basePath;
         $this->responsePath = $basePath.$this->relativeResponsePath;
         $this->requestPath = $basePath.$this->relativeRequestPath;
     }
