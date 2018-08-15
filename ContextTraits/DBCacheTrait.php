@@ -80,7 +80,11 @@ trait DBCacheTrait
      */
     protected function getDbPath()
     {
-        return $this->getContainer()->getParameter('kernel.cache_dir').DIRECTORY_SEPARATOR;
+        $url = $this->getContainer()->getParameter('env(DATABASE_URL)');
+        $path = substr($url, strrpos($url, $this->getContainer()->getParameter('kernel.project_dir')));
+        $path = substr($path, 0, strrpos($path, '/') + 1);
+
+        return $path;
     }
 
     /**

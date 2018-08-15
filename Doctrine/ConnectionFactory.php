@@ -22,6 +22,8 @@ class ConnectionFactory extends BaseConnectionFactory
      */
     private static $dbName = '';
 
+    private static $renameDb = false;
+
     /**
      * {@inheritDoc}
      */
@@ -31,12 +33,28 @@ class ConnectionFactory extends BaseConnectionFactory
         EventManager $eventManager = null,
         array $mappingTypes = []
     ) {
-        if (self::$dbName === '') {
-            $this->createDbName();
+        if (self::$renameDb) {
+            if (self::$dbName === '') {
+                $this->createDbName();
+            }
+            if (isset($params['url'])) {
+                $params['url'] = substr($params['url'], 0, strrpos($params['url'], '/') + 1) . $this->getDbName();
+            } elseif (isset($params['dbname'])) {
+                $params['dbname'] = substr($params['dbname'], 0, strrpos($params['dbname'], '/') + 1) . $this->getDbName();
+                $params['path'] = $params['dbname'];
+            } else {
+                throw new \Exception('There was neither url nor dbname set');
+            }
+        } else {
+            if (isset($params['url'])) {
+                $name = substr($params['url'], strrpos($params['url'], '/'));
+            } elseif (isset($params['dbname'])) {
+                $name = substr($params['dbname'], strrpos($params['dbname'], '/'));
+            } else {
+                throw new \Exception('There was neither url nor dbname set');
+            }
+            $this->setDbName($name);
         }
-
-        $params['dbname'] = substr($params['dbname'], 0, strrpos($params['dbname'], '/') + 1).$this->getDbName();
-        $params['path'] = $params['dbname'];
 
         return parent::createConnection(
             $params,
@@ -60,6 +78,14 @@ class ConnectionFactory extends BaseConnectionFactory
     public function setDbName($dbName)
     {
         self::$dbName = $dbName;
+    }
+
+    public static function setRenameDb(bool $rename)
+    {
+        if (self::$renameDb !== $rename) {
+            self::$dbName = '';
+            self::$renameDb = $rename;
+        }
     }
 
     /**

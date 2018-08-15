@@ -6,13 +6,7 @@
     <parameters>
         <parameter key="doctrine.dbal.connection_factory.class">Kaliber5\BehatBundle\Doctrine\ConnectionFactory</parameter>
     </parameters>
-    <!--
     <services>
-        <service id="kaliber5_behat.example" class="Kaliber5\BehatBundle\Example">
-            <argument type="service" id="service_id" />
-            <argument>plain_value</argument>
-            <argument>%parameter_name%</argument>
-        </service>
+        <service id="Kaliber5\BehatBundle\Doctrine\ConnectionFactory" alias="doctrine.dbal.connection_factory" public="true"/>
     </services>
-    -->
 </container>
