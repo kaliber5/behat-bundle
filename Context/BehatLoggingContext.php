@@ -8,6 +8,7 @@
 
 namespace Kaliber5\BehatBundle\Context;
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @package Kaliber5\BehatBundle\Context
  */
-class BehatLoggingContext
+class BehatLoggingContext implements Context
 {
     /*
      * @var LoggerInterface

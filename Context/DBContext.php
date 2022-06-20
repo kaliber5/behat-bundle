@@ -2,6 +2,7 @@
 
 namespace Kaliber5\BehatBundle\Context;
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -9,7 +10,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Fidry\AliceDataFixtures\Bridge\Doctrine\Persister\ObjectManagerPersister;
 use Hautelook\AliceBundle\FixtureLocatorInterface;
 use Kaliber5\BehatBundle\Doctrine\ConnectionFactory;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class DBContext
@@ -18,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @package Kaliber5\BehatBundle\Context
  */
-class DBContext
+class DBContext implements Context
 {
     private $dbname = '';
 
@@ -26,6 +27,14 @@ class DBContext
      * @var SchemaTool
      */
     private $schemaTool;
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
 
     /**
      * @var ClassMetadata[]
@@ -37,11 +46,13 @@ class DBContext
      */
     protected static $renameDb = false;
 
+    protected $container;
+
     /**
      * @param EntityManagerInterface $entityManager
      * @param ConnectionFactory $factory
      */
-    public function __construct(EntityManagerInterface $entityManager, ConnectionFactory $factory)
+    public function __construct(EntityManagerInterface $entityManager, ConnectionFactory $factory, ContainerInterface $container)
     {
         if (self::$renameDb) {
             $this->setDatabaseName($factory->getDbName());
@@ -50,6 +61,7 @@ class DBContext
 
         $this->schemaTool = new SchemaTool($entityManager);
         $this->classes = $entityManager->getMetadataFactory()->getAllMetadata();
+        $this->container = $container;
     }
 
 

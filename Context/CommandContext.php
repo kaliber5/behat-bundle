@@ -8,6 +8,7 @@
 
 namespace Kaliber5\BehatBundle\Context;
 
+use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Kaliber5\BehatBundle\ContextTraits\EmailAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * A Context to run and tests commands
  */
-class CommandContext
+class CommandContext implements Context
 {
     use EmailAssertionsTrait;
 
