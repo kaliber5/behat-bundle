@@ -3,8 +3,6 @@
 namespace Kaliber5\BehatBundle\Context;
 
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -20,10 +18,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @package Kaliber5\BehatBundle\Context
  */
-class DBContext implements KernelAwareContext
+class DBContext
 {
-    use KernelDictionary;
-
     private $dbname = '';
 
     /**
@@ -42,27 +38,20 @@ class DBContext implements KernelAwareContext
     protected static $renameDb = false;
 
     /**
-     * {@inheritdoc}
+     * @param EntityManagerInterface $entityManager
+     * @param ConnectionFactory $factory
      */
-    public function setKernel(KernelInterface $kernel)
+    public function __construct(EntityManagerInterface $entityManager, ConnectionFactory $factory)
     {
-        $this->kernel = $kernel;
-
-        /** @var ConnectionFactory $factory */
-        $factory = $this->getContainer()->get(ConnectionFactory::class);
         if (self::$renameDb) {
             $this->setDatabaseName($factory->getDbName());
             $factory->setDbName($this->getDatabaseName());
         }
 
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-
         $this->schemaTool = new SchemaTool($entityManager);
         $this->classes = $entityManager->getMetadataFactory()->getAllMetadata();
-
-        return $this;
     }
+
 
     /**
      * @return string

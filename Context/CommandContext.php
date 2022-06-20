@@ -8,9 +8,7 @@
 
 namespace Kaliber5\BehatBundle\Context;
 
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Kaliber5\BehatBundle\ContextTraits\EmailAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -23,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * A Context to run and tests commands
  */
-class CommandContext implements KernelAwareContext, SnippetAcceptingContext
+class CommandContext
 {
     use EmailAssertionsTrait;
 
@@ -115,14 +113,6 @@ class CommandContext implements KernelAwareContext, SnippetAcceptingContext
     public function resetMessageLogger()
     {
         $this->getContainer()->get('swiftmailer.plugin.messagelogger')->clear();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setKernel(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
     }
 
     /**
