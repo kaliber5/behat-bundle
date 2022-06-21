@@ -4,7 +4,7 @@ namespace Kaliber5\BehatBundle\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\MinkExtension\Context\MinkContext;
-use Behat\Symfony2Extension\Driver\KernelDriver;
+use FriendsOfBehat\SymfonyExtension\Driver\SymfonyDriver;
 use Coduo\PHPMatcher\PHPUnit\PHPMatcherAssertions;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -531,9 +531,9 @@ class JsonMinkContext extends MinkContext
     public function getSymfonyProfile()
     {
         $driver = $this->getSession()->getDriver();
-        if (!$driver instanceof KernelDriver) {
+        if (!$driver instanceof SymfonyDriver) {
             throw new UnsupportedDriverActionException(
-                'You need to tag the scenario with '.'"@mink:symfony2". Using the profiler is not '.'supported by %s',
+                'You need to tag the scenario with "@mink:symfony2". Using the profiler is not supported by %s',
                 $driver
             );
         }
@@ -544,7 +544,7 @@ class JsonMinkContext extends MinkContext
         $profile = $driver->getClient()->getProfile();
         if (false === $profile) {
             throw new \RuntimeException(
-                'The profiler is disabled. Activate it by setting '.'framework.profiler.only_exceptions to false in '.'your config'
+                'The profiler is disabled. Activate it by setting framework.profiler.only_exceptions to false in your config'
             );
         }
 

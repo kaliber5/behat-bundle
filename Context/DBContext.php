@@ -2,16 +2,15 @@
 
 namespace Kaliber5\BehatBundle\Context;
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Fidry\AliceDataFixtures\Bridge\Doctrine\Persister\ObjectManagerPersister;
 use Hautelook\AliceBundle\FixtureLocatorInterface;
 use Kaliber5\BehatBundle\Doctrine\ConnectionFactory;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class DBContext
@@ -20,16 +19,22 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @package Kaliber5\BehatBundle\Context
  */
-class DBContext implements KernelAwareContext
+class DBContext implements Context
 {
-    use KernelDictionary;
-
     private $dbname = '';
 
     /**
      * @var SchemaTool
      */
     private $schemaTool;
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
 
     /**
      * @var ClassMetadata[]
@@ -41,28 +46,24 @@ class DBContext implements KernelAwareContext
      */
     protected static $renameDb = false;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setKernel(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
+    protected $container;
 
-        /** @var ConnectionFactory $factory */
-        $factory = $this->getContainer()->get(ConnectionFactory::class);
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param ConnectionFactory $factory
+     */
+    public function __construct(EntityManagerInterface $entityManager, ConnectionFactory $factory, ContainerInterface $container)
+    {
         if (self::$renameDb) {
             $this->setDatabaseName($factory->getDbName());
             $factory->setDbName($this->getDatabaseName());
         }
 
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-
         $this->schemaTool = new SchemaTool($entityManager);
         $this->classes = $entityManager->getMetadataFactory()->getAllMetadata();
-
-        return $this;
+        $this->container = $container;
     }
+
 
     /**
      * @return string

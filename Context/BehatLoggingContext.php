@@ -8,8 +8,8 @@
 
 namespace Kaliber5\BehatBundle\Context;
 
+use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -20,20 +20,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @package Kaliber5\BehatBundle\Context
  */
-class BehatLoggingContext implements KernelAwareContext
+class BehatLoggingContext implements Context
 {
+    /*
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
-     * @var KernelInterface
+     * @param $logger
      */
-    protected $kernel;
-
-    /**
-     * @param KernelInterface $kernel
-     */
-    public function setKernel(KernelInterface $kernel)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->kernel = $kernel;
+        $this->logger = $logger;
     }
 
 
@@ -46,12 +45,6 @@ class BehatLoggingContext implements KernelAwareContext
      */
     public function logStep(BeforeStepScope $scope)
     {
-        if ($this->kernel) {
-            /** @var LoggerInterface $logger */
-            $logger = $this->kernel->getContainer()->get('logger');
-            if ($logger instanceof LoggerInterface) {
-                $logger->debug('BEHATSTEP: '.$scope->getStep()->getText());
-            }
-        }
+        $this->logger->debug('BEHATSTEP: '.$scope->getStep()->getText());
     }
 }

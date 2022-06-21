@@ -7,7 +7,7 @@ use Kaliber5\BehatBundle\ContextTraits\DBCacheTrait;
 /**
  * Class CachedDBContext
  *
- * This uses cached databasefiles
+ * This uses cached database files
  *
  * @package Kaliber5\BehatBundle\Context
  */
